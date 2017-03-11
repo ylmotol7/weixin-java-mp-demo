@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.binarywang.demo.spring.service.WeixinService;
+import com.github.binarywang.demo.spring.utils.WxMpConfigHolder;
 
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
@@ -21,7 +23,7 @@ import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
  * @author Binary Wang
  */
 @RestController
-@RequestMapping("/wechat/portal")
+@RequestMapping("/wechat/{aliasName}/portal")
 public class WxMpPortalController {
   @Autowired
   private WeixinService wxService;
@@ -30,12 +32,12 @@ public class WxMpPortalController {
 
   @ResponseBody
   @GetMapping(produces = "text/plain;charset=utf-8")
-  public String authGet(@RequestParam(name = "signature", required = false) String signature,
+  public String authGet(@PathVariable("aliasName") String aliasName, @RequestParam(name = "signature", required = false) String signature,
       @RequestParam(name = "timestamp", required = false) String timestamp,
       @RequestParam(name = "nonce", required = false) String nonce,
       @RequestParam(name = "echostr", required = false) String echostr) {
     this.logger.info("\n接收到来自微信服务器的认证消息：[{}, {}, {}, {}]", signature, timestamp, nonce, echostr);
-
+    WxMpConfigHolder.setAliasName(aliasName);
     if (StringUtils.isAnyBlank(signature, timestamp, nonce, echostr)) {
       throw new IllegalArgumentException("请求参数非法，请核实!");
     }
@@ -49,10 +51,11 @@ public class WxMpPortalController {
 
   @ResponseBody
   @PostMapping(produces = "application/xml; charset=UTF-8")
-  public String post(@RequestBody String requestBody, @RequestParam("signature") String signature,
+  public String post(@PathVariable("aliasName") String aliasName, @RequestBody String requestBody, @RequestParam("signature") String signature,
       @RequestParam(name = "encrypt_type", required = false) String encType,
       @RequestParam(name = "msg_signature", required = false) String msgSignature,
       @RequestParam("timestamp") String timestamp, @RequestParam("nonce") String nonce) {
+	  WxMpConfigHolder.setAliasName(aliasName);
     this.logger.info(
         "\n接收微信请求：[signature=[{}], encType=[{}], msgSignature=[{}],"
             + " timestamp=[{}], nonce=[{}], requestBody=[\n{}\n] ",

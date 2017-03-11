@@ -2,6 +2,14 @@ package com.github.binarywang.demo.spring.service;
 
 import javax.annotation.PostConstruct;
 
+import me.chanjar.weixin.common.api.WxConsts;
+import me.chanjar.weixin.mp.api.WxMpConfigStorage;
+import me.chanjar.weixin.mp.api.WxMpMessageRouter;
+import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
+import me.chanjar.weixin.mp.bean.kefu.result.WxMpKfOnlineList;
+import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
+import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +26,7 @@ import com.github.binarywang.demo.spring.handler.NullHandler;
 import com.github.binarywang.demo.spring.handler.StoreCheckNotifyHandler;
 import com.github.binarywang.demo.spring.handler.SubscribeHandler;
 import com.github.binarywang.demo.spring.handler.UnsubscribeHandler;
-
-import me.chanjar.weixin.common.api.WxConsts;
-import me.chanjar.weixin.mp.api.WxMpInMemoryConfigStorage;
-import me.chanjar.weixin.mp.api.WxMpMessageRouter;
-import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
-import me.chanjar.weixin.mp.bean.kefu.result.WxMpKfOnlineList;
-import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
-import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
+import com.github.binarywang.demo.spring.utils.WxMpConfigHolder;
 
 /**
  * 
@@ -49,9 +50,6 @@ public class WeixinService extends WxMpServiceImpl {
   protected StoreCheckNotifyHandler storeCheckNotifyHandler;
 
   @Autowired
-  private WxMpConfig wxConfig;
-
-  @Autowired
   private LocationHandler locationHandler;
 
   @Autowired
@@ -70,17 +68,16 @@ public class WeixinService extends WxMpServiceImpl {
 
   @PostConstruct
   public void init() {
-    final WxMpInMemoryConfigStorage config = new WxMpInMemoryConfigStorage();
-    config.setAppId(this.wxConfig.getAppid());// 设置微信公众号的appid
-    config.setSecret(this.wxConfig.getAppsecret());// 设置微信公众号的app corpSecret
-    config.setToken(this.wxConfig.getToken());// 设置微信公众号的token
-    config.setAesKey(this.wxConfig.getAesKey());// 设置消息加解密密钥
-    super.setWxMpConfigStorage(config);
-
     this.refreshRouter();
   }
 
-  private void refreshRouter() {
+  	@Override
+	public WxMpConfigStorage getWxMpConfigStorage() {
+  		System.out.println("-----------取到了");
+		return WxMpConfigHolder.getWxMpInMemoryConfigStorage();
+	}
+
+private void refreshRouter() {
     final WxMpMessageRouter newRouter = new WxMpMessageRouter(this);
 
     // 记录所有事件的日志

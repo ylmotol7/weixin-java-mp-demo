@@ -7,7 +7,7 @@
     <artifactId>weixin-java-mp-demo</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>Weixin MP Demo</name>
+    <name>Weixin MP Demo Fork</name>
     <description>weixin mp demo with spring MVC</description>
     <url>https://github.com/wechat-group/weixin-java-mp-demo</url>
     <properties>
